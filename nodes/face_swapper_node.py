@@ -45,14 +45,12 @@ class FaceSwapperNode(AiNode):
     def evalImplementation_thread(self, index=0):
         pixmap1 = self.getInputData(0)
         pixmap2 = self.getInputData(1)
-
         if pixmap1 and pixmap2:
 
-            print("SWAPPING")
 
             face_img = pixmap_to_pil_image(pixmap1[0])
             target_img = pixmap_to_pil_image(pixmap2[0])
-            result = gs.models["faceswap"](face_img, target_img, self.new)
+            result = gs.models["faceswap"](face_img, target_img, True)
 
             pixmap = pil_image_to_pixmap(result)
 
