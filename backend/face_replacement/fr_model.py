@@ -40,6 +40,20 @@ class FaceReplacementModel():
                                                     'trt_sparsity_enable': False,
                                                     'trt_builder_optimization_level': '3',
                                                     'trt_auxiliary_streams': '-1'})]"""
+
+
+        providers = [('CUDAExecutionProvider', {'do_copy_in_default_stream': '1',
+                                                'cudnn_conv_algo_search': 'DEFAULT',
+                                                'device_id': '0',
+                                                'enable_cuda_graph': False,
+                                                'gpu_mem_limit': '18446744073709551615',
+                                                'arena_extend_strategy': 'kNextPowerOfTwo',
+                                                'cudnn_conv_use_max_workspace': True,
+                                                'cudnn_conv1d_pad_to_nc1d': False,
+                                                'tunable_op_enable': True,
+                                                'tunable_op_tuning_enable': True,
+                                                'enable_skip_layer_norm_strict_mode': '0'})]
+
         model_path = 'models/other/roopVideoFace_v10.onnx'
         if not os.path.isfile(model_path):
             import gdown
