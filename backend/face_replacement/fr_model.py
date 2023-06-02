@@ -65,22 +65,29 @@ class FaceReplacementModel():
         self.face_analyser = insightface.app.FaceAnalysis(name='buffalo_l', providers=providers)
         self.face_analyser.prepare(ctx_id=0, det_size=(640, 640))
         self.source_face_tensor = None
+        self.single = None
 
-    def __call__(self, source_face_img, target_face_img, recalc=True):
+    def __call__(self, source_face_img, target_face_img, recalc=True, single=True):
 
         source_face = np.array(source_face_img).astype(np.uint8)
         #source_face_img_array = cv2.cvtColor(source_face, cv2.COLOR_RGB2BGR)  # Assuming the PIL image is RGB
 
         target_img = np.array(target_face_img).astype(np.uint8)
         #target_img_array = cv2.cvtColor(target_img, cv2.COLOR_RGB2BGR)  # Assuming the PIL image is RGB
+        if single:
 
-        face_tensor = self.get_face(target_img)
+            face_tensor = self.get_face(target_img)
+        else:
+            face_tensor = self.get_face_many(target_img)
         if recalc or self.source_face_tensor == None:
-            self.source_face_tensor = self.get_face(source_face)
+                self.source_face_tensor = self.get_face(source_face)
 
         if face_tensor:
-
-            result = self.face_swapper.get(target_img, face_tensor, self.source_face_tensor, paste_back=True)
+            if single:
+                result = self.face_swapper.get(target_img, face_tensor, self.source_face_tensor, paste_back=True)
+            else:
+                for face in face_tensor:
+                    result = self.face_swapper.get(target_img, face, self.source_face_tensor, paste_back=True)
 
             image = Image.fromarray(result)
             return image
@@ -91,6 +98,12 @@ class FaceReplacementModel():
         analysed = self.face_analyser.get(frame)
         try:
             return sorted(analysed, key=lambda x: x.bbox[0])[0]
+        except IndexError:
+            return None
+
+    def get_face_many(self, frame):
+        try:
+            return self.face_analyser.get(frame)
         except IndexError:
             return None
 

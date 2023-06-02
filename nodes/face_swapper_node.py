@@ -13,6 +13,7 @@ OP_NODE_FACE_SWAP = get_next_opcode()
 class FaceSwapperWidget(QDMNodeContentWidget):
 
     def initUI(self):
+        self.checkbox = self.create_check_box("MultiFace")
         self.create_main_layout()
 
 
@@ -50,7 +51,8 @@ class FaceSwapperNode(AiNode):
 
             face_img = pixmap_to_pil_image(pixmap1[0])
             target_img = pixmap_to_pil_image(pixmap2[0])
-            result = gs.models["faceswap"](face_img, target_img, True)
+            single = not self.content.checkbox.isChecked()
+            result = gs.models["faceswap"](face_img, target_img, True, single)
 
             pixmap = pil_image_to_pixmap(result)
 
@@ -58,12 +60,8 @@ class FaceSwapperNode(AiNode):
                 self.new = None
 
             return [pixmap]
-        elif pixmap1:
-            return [pixmap1[0]]
-        elif pixmap2:
-            return [pixmap2[0]]
         else:
-            return None
+            return pixmap2
     def onInputChanged(self, socket=None):
         self.new = True
 
