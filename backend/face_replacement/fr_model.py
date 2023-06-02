@@ -87,8 +87,8 @@ class FaceReplacementModel():
                 result = self.face_swapper.get(target_img, face_tensor, self.source_face_tensor, paste_back=True)
             else:
                 for face in face_tensor:
-                    result = self.face_swapper.get(target_img, face, self.source_face_tensor, paste_back=True)
-
+                    target_img = self.face_swapper.get(target_img, face, self.source_face_tensor, paste_back=True)
+                result = target_img
             image = Image.fromarray(result)
             return image
         else:
