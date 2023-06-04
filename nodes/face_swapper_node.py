@@ -42,7 +42,7 @@ class FaceSwapperNode(AiNode):
         gs.models["faceswap"] = FaceReplacementModel()
         self.new = None
 
-    @QtCore.Slot()
+    #@QtCore.Slot()
     def evalImplementation_thread(self, index=0):
         pixmap1 = self.getInputData(0)
         pixmap2 = self.getInputData(1)
@@ -65,7 +65,7 @@ class FaceSwapperNode(AiNode):
     def onInputChanged(self, socket=None):
         self.new = True
 
-    @QtCore.Slot(object)
+    #@QtCore.Slot(object)
     def onWorkerFinished(self, result):
         super().onWorkerFinished(None)
         self.setOutput(0, result)
