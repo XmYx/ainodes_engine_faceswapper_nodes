@@ -20,7 +20,7 @@ class FaceSwapperWidget(QDMNodeContentWidget):
 
 @register_node(OP_NODE_FACE_SWAP)
 class FaceSwapperNode(AiNode):
-    icon = "ainodes_frontend/icons/base_nodes/image_blend.png"
+    icon = "ainodes_frontend/icons/base_nodes/v2/faceswap.png"
     op_code = OP_NODE_FACE_SWAP
     op_title = "Face Swapper"
     content_label_objname = "face_swapper_node"
