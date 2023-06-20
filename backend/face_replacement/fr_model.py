@@ -1,4 +1,6 @@
 import os
+import threading
+from typing import List
 
 import numpy as np
 import requests
@@ -6,7 +8,7 @@ from PIL import Image
 import onnxruntime
 import insightface
 
-from custom_nodes.ainodes_engine_base_nodes.ainodes_backend import poorman_wget
+from ai_nodes.ainodes_engine_base_nodes.ainodes_backend import poorman_wget
 
 
 class FaceReplacementModel():
@@ -79,6 +81,7 @@ class FaceReplacementModel():
             face_tensor = self.get_face(target_img)
         else:
             face_tensor = self.get_face_many(target_img)
+            print("FACE TENSOR", face_tensor)
         if recalc or self.source_face_tensor == None:
                 self.source_face_tensor = self.get_face(source_face)
 
@@ -93,6 +96,24 @@ class FaceReplacementModel():
             return image
         else:
             return target_face_img
+
+    def process_list(self, image_list_array, source_face_array):
+
+        #source_face = np.array(source_face_img).astype(np.uint8)
+        source_face_tensor = self.get_face(source_face_array)
+
+
+        if source_face_tensor:
+            result_imgs = []
+
+            for image in image_list_array:
+                #target_img = np.array(image).astype(np.uint8)
+                face_tensor = self.get_face(image)
+                img = self.face_swapper.get(image, face_tensor, source_face_tensor, paste_back=True)
+                result_imgs.append(img)
+            return result_imgs
+        else:
+            raise RuntimeError("The source face image could not be processed, please provide an other face image")
 
     def get_face(self, frame):
         analysed = self.face_analyser.get(frame)
@@ -116,3 +137,27 @@ def download_file(url, save_path):
         print("File downloaded successfully!")
     else:
         print("Failed to download the file.")
+
+
+def multi_process_frame(source_img, frame_paths, progress):
+    threads = []
+    num_threads = 5
+    num_frames_per_thread = len(frame_paths) // num_threads
+    remaining_frames = len(frame_paths) % num_threads
+
+    # create thread and launch
+    start_index = 0
+    for _ in range(num_threads):
+        end_index = start_index + num_frames_per_thread
+        if remaining_frames > 0:
+            end_index += 1
+            remaining_frames -= 1
+        thread_frame_paths = frame_paths[start_index:end_index]
+        thread = threading.Thread(target=process_frames, args=(source_img, thread_frame_paths, progress))
+        threads.append(thread)
+        thread.start()
+        start_index = end_index
+
+    # threading
+    for thread in threads:
+        thread.join()
