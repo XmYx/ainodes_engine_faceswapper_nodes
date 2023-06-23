@@ -4,7 +4,8 @@ from ainodes_frontend.base import register_node, get_next_opcode
 from ainodes_frontend.base import AiNode, CalcGraphicsNode
 from ainodes_frontend.node_engine.node_content_widget import QDMNodeContentWidget
 
-from ...ainodes_engine_base_nodes.ainodes_backend import pixmap_to_pil_image, pil_image_to_pixmap
+from ...ainodes_engine_base_nodes.ainodes_backend import pixmap_to_tensor, tensor_image_to_pixmap, tensor2pil, \
+    pil2tensor
 from ainodes_frontend import singleton as gs
 from ai_nodes.ainodes_engine_faceswapper_nodes.backend.face_replacement.fr_model import FaceReplacementModel
 
@@ -24,7 +25,7 @@ class FaceSwapperNode(AiNode):
     op_code = OP_NODE_FACE_SWAP
     op_title = "Face Swapper"
     content_label_objname = "face_swapper_node"
-    category = "Image"
+    category = "aiNodes Base/Image"
     help_text = "Face Swapper\n\n" \
                 ""
 
@@ -50,12 +51,12 @@ class FaceSwapperNode(AiNode):
         if pixmap1 and pixmap2:
 
 
-            face_img = pixmap_to_pil_image(pixmap1[0]).convert("RGB")
-            target_img = pixmap_to_pil_image(pixmap2[0]).convert("RGB")
+            face_img = tensor2pil(pixmap1[0]).convert("RGB")
+            target_img = tensor2pil(pixmap2[0]).convert("RGB")
             single = not self.content.checkbox.isChecked()
             result = gs.models["faceswap"](face_img, target_img, True, single)
             print(result)
-            pixmap = pil_image_to_pixmap(result)
+            pixmap = pil2tensor(result)
 
             if self.new:
                 self.new = None
