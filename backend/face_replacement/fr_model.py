@@ -6,7 +6,7 @@ from PIL import Image
 import onnxruntime
 import insightface
 
-from custom_nodes.ainodes_engine_base_nodes.ainodes_backend import poorman_wget
+from ai_nodes.ainodes_engine_base_nodes.ainodes_backend import poorman_wget
 
 
 class FaceReplacementModel():
@@ -54,11 +54,11 @@ class FaceReplacementModel():
                                                 'tunable_op_tuning_enable': True,
                                                 'enable_skip_layer_norm_strict_mode': '0'})]
 
-        model_path = 'models/other/roopVideoFace_v10.onnx'
-        if not os.path.isfile(model_path):
-            import gdown
-            url = '1JxYLMECet8pU3Jq7EEcCw5p5xnFWTg5I'
-            gdown.download(id=url, output=model_path, quiet=False)
+        model_path = 'models/other/inswapper_128.onnx'
+        # if not os.path.isfile(model_path):
+        #     import gdown
+        #     url = '1JxYLMECet8pU3Jq7EEcCw5p5xnFWTg5I'
+        #     gdown.download(id=url, output=model_path, quiet=False)
 
 
         self.face_swapper = insightface.model_zoo.get_model(model_path, providers=providers)
